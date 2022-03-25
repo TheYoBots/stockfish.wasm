@@ -72,6 +72,47 @@ namespace {
         v->materialCounting = BLACK_DRAW_ODDS;
         return v;
     }
+    // antiempire is broken due to contradicting rules
+    Variant* antiempire_variant() {
+        Variant* v = chess_variant()->init();
+        v->add_piece(CUSTOM_PIECES, 'e', "mQcN");
+        v->add_piece(CUSTOM_PIECES + 1, 'c', "mQcB");
+        v->add_piece(CUSTOM_PIECES + 2, 't', "mQcR");
+        v->add_piece(CUSTOM_PIECES + 3, 'd', "mQcK");
+        v->add_piece(SOLDIER, 's');
+        v->promotionPieceTypes = {QUEEN};
+        v->startFen = "rnbqkbnr/pppppppp/8/8/8/PPPSSPPP/8/TECDKCET w kq - 0 1";
+        v->stalemateValue = -VALUE_MATE;
+        v->nFoldValue = -VALUE_MATE;
+        v->flagPiece = KING;
+        v->whiteFlag = Rank8BB;
+        v->blackFlag = Rank1BB;
+        v->flyingGeneral = true;
+        v->mustCapture = true;
+        v->stalemateValue = VALUE_MATE;
+        v->extinctionValue = VALUE_MATE;
+        v->extinctionPieceTypes = {ALL_PIECES};
+        v->extinctionPseudoRoyal = false;
+        return v;
+    }
+    Variant* antiorda_variant() {
+        Variant* v = chess_variant()->init();
+        v->add_piece(CENTAUR, 'h');
+        v->add_piece(KNIBIS, 'a');
+        v->add_piece(KNIROO, 'l');
+        v->add_piece(SILVER, 'y');
+        v->promotionPieceTypes = {QUEEN, CENTAUR};
+        v->startFen = "lhaykahl/8/pppppppp/8/8/8/PPPPPPPP/RNBQKBNR w KQ - 0 1";
+        v->flagPiece = KING;
+        v->whiteFlag = Rank8BB;
+        v->blackFlag = Rank1BB;
+        v->mustCapture = true;
+        v->stalemateValue = VALUE_MATE;
+        v->extinctionValue = VALUE_MATE;
+        v->extinctionPieceTypes = {ALL_PIECES};
+        v->extinctionPseudoRoyal = false;
+        return v;
+    }
     // Pseudo-variant only used for endgame initialization
     Variant* fairy_variant() {
         Variant* v = chess_variant_base()->init();
@@ -251,6 +292,11 @@ namespace {
         v->flagMove = false;
         return v;
     }
+    Variant* coffeehill_variant() {
+        Variant* v = kingofthehill_variant()->init();
+        v->mustCapture = true;
+        return v;
+    }
     // Racing Kings
     // https://lichess.org/variant/racingKings
     Variant* racingkings_variant() {
@@ -262,6 +308,11 @@ namespace {
         v->flagMove = true;
         v->castling = false;
         v->checking = false;
+        return v;
+    }
+    Variant* coffeerace_variant() {
+        Variant* v = racingkings_variant()->init();
+        v->mustCapture = true;
         return v;
     }
     // Knightmate
@@ -343,6 +394,37 @@ namespace {
         v->extinctionPieceTypes = {COMMONER, QUEEN, ROOK, BISHOP, KNIGHT, PAWN};
         return v;
     }
+    Variant* anti_antichess_variant() {
+        Variant* v = giveaway_variant()->init();
+        v->castling = false;
+        v->extinctionValue = -VALUE_MATE;
+        v->stalemateValue = -VALUE_MATE;
+        return v;
+    }
+    Variant* antihouse_variant() {
+        Variant* v = giveaway_variant()->init();
+        v->pieceDrops = true;
+        v->capturesToHand = true;
+        v->pocketSize = 6;
+        v->castling = false;
+        return v;
+    }
+    Variant* antiatomic_variant() {
+        Variant* v = giveaway_variant()->init();
+        v->blastOnCapture = true;
+        v->castling = false;
+        v->extinctionOpponentPieceCount = 1;
+        return v;
+    }
+    Variant* atomic_giveaway_hill_variant() {
+        Variant* v = giveaway_variant()->init();
+        v->blastOnCapture = true;
+        v->flagPiece = KING;
+        v->whiteFlag = (Rank4BB | Rank5BB) & (FileDBB | FileEBB);
+        v->blackFlag = (Rank4BB | Rank5BB) & (FileDBB | FileEBB);
+        v->castling = false;
+        return v;
+    }
     // Kinglet
     // https://en.wikipedia.org/wiki/V._R._Parton#Kinglet_chess
     Variant* kinglet_variant() {
@@ -373,6 +455,20 @@ namespace {
         v->enPassantRegion = Rank3BB | Rank6BB; // exclude en passant on second rank
         v->extinctionValue = -VALUE_MATE;
         v->extinctionPieceTypes = {ALL_PIECES};
+        return v;
+    }
+    Variant* antipawns_variant() {
+        Variant* v = horde_variant()->init();
+        v->remove_piece(KING);
+        v->add_piece(COMMONER, 'k');
+        v->startFen = "pppppppp/pppppppp/pppppppp/8/8/PPPPPPPP/PPPPPPPP/PPPPPPPP w - - 0 1";
+        v->promotionPieceTypes = {KNIGHT, BISHOP, ROOK, QUEEN, KING};
+        v->stalemateValue = VALUE_MATE;
+        v->extinctionValue = VALUE_MATE;
+        v->mustCapture = true;
+        v->extinctionPieceTypes = {ALL_PIECES};
+        v->extinctionPseudoRoyal = false;
+        v->castling = false;
         return v;
     }
     // Atomic chess without checks (ICC rules)
@@ -413,6 +509,13 @@ namespace {
         v->nnueAlias = "3check";
         return v;
     }
+    Variant* coffee_3check_variant() {
+        Variant* v = threecheck_variant()->init();
+        v->startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 3+3 0 1";
+        v->checkCounting = true;
+        v->mustCapture = true;
+        return v;
+    }
     // Crazyhouse
     // Chess with piece drops
     // https://en.wikipedia.org/wiki/Crazyhouse
@@ -422,6 +525,11 @@ namespace {
         v->startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR[] w KQkq - 0 1";
         v->pieceDrops = true;
         v->capturesToHand = true;
+        return v;
+    }
+    Variant* coffeehouse_variant() {
+        Variant* v = crazyhouse_variant();
+        v->mustCapture = true;
         return v;
     }
     // Loop chess
@@ -467,6 +575,72 @@ namespace {
         v->extinctionOpponentPieceCount = 2; // own all kings/commoners
         return v;
     }
+    Variant* antishogun_variant() {
+        Variant* v = crazyhouse_variant()->init();
+        v->remove_piece(KING);
+        v->add_piece(COMMONER, 'c');
+        v->add_piece(CENTAUR, 'g');
+        v->add_piece(ARCHBISHOP, 'a');
+        v->add_piece(CHANCELLOR, 'm');
+        v->add_piece(FERS, 'f');
+        v->startFen = "rnb+fkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNB+FKBNR[] w KQkq - 0 1";
+        v->promotionRank = RANK_6;
+        v->promotionLimit[CENTAUR] = 1;
+        v->promotionLimit[ARCHBISHOP] = 1;
+        v->promotionLimit[CHANCELLOR] = 1;
+        v->promotionLimit[QUEEN] = 1;
+        v->promotionPieceTypes = {};
+        v->promotedPieceType[PAWN] = COMMONER;
+        v->promotedPieceType[KNIGHT] = CENTAUR;
+        v->promotedPieceType[BISHOP] = ARCHBISHOP;
+        v->promotedPieceType[ROOK] = CHANCELLOR;
+        v->promotedPieceType[FERS] = QUEEN;
+        v->mandatoryPawnPromotion = false;
+        v->firstRankPawnDrops = true;
+        v->promotionZonePawnDrops = true;
+        v->whiteDropRegion = Rank1BB | Rank2BB | Rank3BB | Rank4BB | Rank5BB;
+        v->blackDropRegion = Rank8BB | Rank7BB | Rank6BB | Rank5BB | Rank4BB;
+        v->immobilityIllegal = true;
+        v->mustCapture = true;
+        v->stalemateValue = VALUE_MATE;
+        v->extinctionValue = VALUE_MATE;
+        v->extinctionPieceTypes = {ALL_PIECES};
+        v->extinctionPseudoRoyal = false;
+        v->castling = false;
+        return v;
+    }
+    Variant* antishinobi_variant() {
+        Variant* v = crazyhouse_variant()->init();
+        v->add_piece(COMMONER, 'c');
+        v->add_piece(BERS, 'd');
+        v->add_piece(SHOGI_KNIGHT, 'h');
+        v->add_piece(ARCHBISHOP, 'j');
+        v->add_piece(LANCE, 'l');
+        v->add_piece(FERS, 'm');
+        v->startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/LH1CK1HL[LHMMDJ] w kq - 0 1";
+        v->promotionRank = RANK_7;
+        v->promotionPieceTypes = {};
+        v->promotedPieceType[PAWN] = COMMONER;
+        v->promotedPieceType[SHOGI_KNIGHT] = KNIGHT;
+        v->promotedPieceType[LANCE] = ROOK;
+        v->promotedPieceType[FERS] = BISHOP;
+        v->mandatoryPiecePromotion = true;
+        v->stalemateValue = -VALUE_MATE;
+        v->nFoldRule = 4;
+        v->perpetualCheckIllegal = true;
+        v->capturesToHand = false;
+        v->whiteDropRegion = Rank1BB | Rank2BB | Rank3BB | Rank4BB;
+        v->immobilityIllegal = true;
+        v->flagPiece = KING;
+        v->whiteFlag = Rank8BB;
+        v->blackFlag = Rank1BB;
+        v->mustCapture = true;
+        v->stalemateValue = VALUE_MATE;
+        v->extinctionValue = VALUE_MATE;
+        v->extinctionPieceTypes = {ALL_PIECES};
+        v->extinctionPseudoRoyal = false;
+        return v;
+    }
     // Pocket Knight chess
     // Each player has an additional knight in hand which can be dropped at any move
     // https://www.chessvariants.com/other.dir/pocket.html
@@ -477,6 +651,28 @@ namespace {
         v->startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR[Nn] w KQkq - 0 1";
         v->pieceDrops = true;
         v->capturesToHand = false;
+        return v;
+    }
+    Variant* antisynochess_variant() {
+        Variant* v = pocketknight_variant()->init();
+        v->add_piece(JANGGI_CANNON, 'c');
+        v->add_piece(SOLDIER, 's');
+        v->add_piece(HORSE, 'h');
+        v->add_piece(FERS_ALFIL, 'e');
+        v->add_piece(COMMONER, 'a');
+        v->startFen = "rneakenr/8/1c4c1/1ss2ss1/8/8/PPPPPPPP/RNBQKBNR[ss] w KQ - 0 1";
+        v->stalemateValue = -VALUE_MATE;
+        v->perpetualCheckIllegal = true;
+        v->flyingGeneral = true;
+        v->blackDropRegion = Rank5BB;
+        v->flagPiece = KING;
+        v->whiteFlag = Rank8BB;
+        v->blackFlag = Rank1BB;
+        v->mustCapture = true;
+        v->stalemateValue = VALUE_MATE;
+        v->extinctionValue = VALUE_MATE;
+        v->extinctionPieceTypes = {ALL_PIECES};
+        v->extinctionPseudoRoyal = false;
         return v;
     }
     // Placement/Pre-chess
@@ -494,6 +690,19 @@ namespace {
         v->dropOppositeColoredBishop = true;
         v->castlingDroppedPiece = true;
         v->nnueAlias = "nn-";
+        return v;
+    }
+    Variant* antiplacement_variant() {
+        Variant* v = placement_variant()->init();
+        v->remove_piece(KING);
+        v->add_piece(COMMONER, 'k');
+        v->promotionPieceTypes = {KNIGHT, BISHOP, ROOK, QUEEN, KING};
+        v->mustCapture = true;
+        v->stalemateValue = VALUE_MATE;
+        v->extinctionValue = VALUE_MATE;
+        v->extinctionPieceTypes = {ALL_PIECES};
+        v->extinctionPseudoRoyal = false;
+        v->castling = false;
         return v;
     }
     // Sittuyin (Burmese chess)
@@ -589,6 +798,17 @@ namespace {
         v->nFoldValue = -VALUE_MATE;
         v->nFoldValueAbsolute = true;
         v->nnueAlias = "minishogi";
+        return v;
+    }
+    Variant* antiminishogi_variant() {
+        Variant* v = minishogi_variant()->init();
+        v->remove_piece(KING);
+        v->add_piece(COMMONER, 'k');
+        v->mustCapture = true;
+        v->stalemateValue = VALUE_MATE;
+        v->extinctionValue = VALUE_MATE;
+        v->extinctionPieceTypes = {ALL_PIECES};
+        v->extinctionPseudoRoyal = false;
         return v;
     }
     // Kyoto shogi
@@ -1028,6 +1248,18 @@ namespace {
         v->nnueAlias = "capablanca";
         return v;
     }
+    Variant* anticapablanca_variant() {
+        Variant* v = capablanca_variant()->init();
+        v->remove_piece(KING);
+        v->add_piece(COMMONER, 'k');
+        v->mustCapture = true;
+        v->stalemateValue = VALUE_MATE;
+        v->extinctionValue = VALUE_MATE;
+        v->extinctionPieceTypes = {ALL_PIECES};
+        v->extinctionPseudoRoyal = false;
+        v->castling = false;
+        return v;
+    }
     // Janus chess
     // 10x8 variant with two archbishops per side
     // https://en.wikipedia.org/wiki/Janus_Chess
@@ -1172,6 +1404,19 @@ namespace {
         v->castling = false;
         return v;
     }
+    Variant* antigrandhouse_variant() {
+        Variant* v = grand_variant()->init();
+        v->startFen = "r8r/1nbqkcabn1/pppppppppp/10/10/10/10/PPPPPPPPPP/1NBQKCABN1/R8R[] w - - 0 1";
+        v->pieceDrops = true;
+        v->capturesToHand = true;
+        v->mustCapture = true;
+        v->stalemateValue = VALUE_MATE;
+        v->extinctionValue = VALUE_MATE;
+        v->extinctionPieceTypes = {ALL_PIECES};
+        v->extinctionPseudoRoyal = false;
+        v->castling = false;
+        return v;
+    }
     // Opulent chess
     // Variant of Grand chess with two extra pieces
     // https://www.chessvariants.com/rules/opulent-chess
@@ -1240,6 +1485,43 @@ namespace {
         v->maxFile = FILE_J;
         v->startFen = "PpPpPpPpPp/pPpPpPpPpP/PpPpPpPpPp/pPpPpPpPpP/PpPpPpPpPp/"
                       "pPpPpPpPpP/PpPpPpPpPp/pPpPpPpPpP/PpPpPpPpPp/pPpPpPpPpP w 0 1";
+        return v;
+    }
+    Variant* antichak_variant() {
+        Variant* v = chess_variant_base()->init();
+        v->maxRank = RANK_9;
+        v->maxFile = FILE_I;
+        v->add_piece(ROOK, 'r');
+        v->add_piece(KNIGHT, 'v');
+        v->add_piece(CENTAUR, 'j');
+        v->add_piece(IMMOBILE_PIECE, 'o');
+        v->add_piece(CUSTOM_PIECES, 's', "FvW");
+        v->add_piece(CUSTOM_PIECES + 1, 'q', "pQ");
+        v->add_piece(CUSTOM_PIECES + 2, 'd', "mQ2cQ2");
+        v->add_piece(CUSTOM_PIECES + 3, 'p', "fsmWfceF");
+        v->add_piece(CUSTOM_PIECES + 4, 'k', "WF");
+        v->add_piece(CUSTOM_PIECES + 5, 'w', "FvW");
+        v->startFen = "rvsqkjsvr/4o4/p1p1p1p1p/9/9/9/P1P1P1P1P/4O4/RVSJKQSVR w - - 0 1";
+        v->mobilityRegion[WHITE][CUSTOM_PIECES + 5] = Rank5BB | Rank6BB | Rank7BB | Rank8BB | Rank9BB;
+        v->mobilityRegion[WHITE][CUSTOM_PIECES +2] = v->mobilityRegion[WHITE][CUSTOM_PIECES + 5];
+        v->mobilityRegion[BLACK][CUSTOM_PIECES + 5] = Rank1BB | Rank2BB | Rank3BB | Rank4BB | Rank5BB;
+        v->mobilityRegion[BLACK][CUSTOM_PIECES + 2] = v->mobilityRegion[BLACK][CUSTOM_PIECES + 5];
+        v->promotionRank = RANK_5;
+        v->promotionPieceTypes = {};
+        v->mandatoryPiecePromotion = true;
+        v->promotedPieceType[CUSTOM_PIECES + 3] = CUSTOM_PIECES + 5;
+        v->promotedPieceType[CUSTOM_PIECES + 4] = CUSTOM_PIECES + 2;
+        v->flagPiece = CUSTOM_PIECES + 2;
+        v->whiteFlag = make_bitboard(SQ_E8);
+        v->blackFlag = make_bitboard(SQ_E2);
+        v->nMoveRule = 50;
+        v->nFoldRule = 3;
+        v->nFoldValue = VALUE_DRAW;
+        v->stalemateValue = VALUE_MATE;
+        v->extinctionValue = VALUE_MATE;
+        v->mustCapture = true;
+        v->extinctionPieceTypes = {ALL_PIECES};
+        v->extinctionPseudoRoyal = false;
         return v;
     }
 #ifdef ALLVARS
@@ -1370,6 +1652,8 @@ void VariantMap::init() {
     add("fischerandom", chess960_variant());
     add("nocastle", nocastle_variant());
     add("armageddon", armageddon_variant());
+    add("antiempire", antiempire_variant());
+    add("antiorda", antiorda_variant());
     add("fairy", fairy_variant()); // fairy variant used for endgame code initialization
     add("makruk", makruk_variant());
     add("makpong", makpong_variant());
@@ -1385,7 +1669,9 @@ void VariantMap::init() {
     add("hoppelpoppel", hoppelpoppel_variant());
     add("newzealand", newzealand_variant());
     add("kingofthehill", kingofthehill_variant());
+    add("coffeehill", coffeehill_variant());
     add("racingkings", racingkings_variant());
+    add("coffeerace", coffeerace_variant());
     add("knightmate", knightmate_variant());
     add("losers", losers_variant());
     add("giveaway", giveaway_variant());
@@ -1393,24 +1679,36 @@ void VariantMap::init() {
     add("suicide", suicide_variant());
     add("codrus", codrus_variant());
     add("extinction", extinction_variant());
+    add("anti_antichess", anti_antichess_variant());
+    add("antihouse", antihouse_variant());
+    add("antiatomic", antiatomic_variant());
+    add("atomic_giveaway_hill", atomic_giveaway_hill_variant());
     add("kinglet", kinglet_variant());
     add("threekings", threekings_variant());
     add("horde", horde_variant());
+    add("antipawns", antipawns_variant());
     add("nocheckatomic", nocheckatomic_variant());
     add("atomic", atomic_variant());
     add("3check", threecheck_variant());
     add("5check", fivecheck_variant());
+    add("coffee_3check", coffee_3check_variant());
     add("crazyhouse", crazyhouse_variant());
+    add("coffeehouse", coffeehouse_variant());
     add("loop", loop_variant());
     add("chessgi", chessgi_variant());
     add("bughouse", bughouse_variant());
     add("koedem", koedem_variant());
+    add("antishogun", antishogun_variant());
+    add("antishinobi", antishinobi_variant());
     add("pocketknight", pocketknight_variant());
+    add("antisynochess", antisynochess_variant());
     add("placement", placement_variant());
+    add("antiplacement", antiplacement_variant());
     add("sittuyin", sittuyin_variant());
     add("seirawan", seirawan_variant());
     add("shouse", shouse_variant());
     add("minishogi", minishogi_variant());
+    add("antiminishogi", antiminishogi_variant());
     add("mini", minishogi_variant());
     add("kyotoshogi", kyotoshogi_variant());
     add("micro", microshogi_variant());
@@ -1438,6 +1736,7 @@ void VariantMap::init() {
     add("capahouse", capahouse_variant());
     add("caparandom", caparandom_variant());
     add("gothic", gothic_variant());
+    add("anticapablanca", anticapablanca_variant());
     add("janus", janus_variant());
     add("modern", modern_variant());
     add("chancellor", chancellor_variant());
@@ -1446,10 +1745,12 @@ void VariantMap::init() {
     add("jesonmor", jesonmor_variant());
     add("courier", courier_variant());
     add("grand", grand_variant());
+    add("antigrandhouse", antigrandhouse_variant());
     add("opulent", opulent_variant());
     add("tencubed", tencubed_variant());
     add("shako", shako_variant());
     add("clobber10", clobber10_variant());
+    add("antichak", antichak_variant());
 #ifdef ALLVARS
     add("amazons", amazons_variant());
 #endif
